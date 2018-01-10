@@ -1,0 +1,27 @@
+[debug] [2018-01-09T12:24:59.814Z] ----------------------------------------------------------------------
+[debug] [2018-01-09T12:24:59.816Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Mattias Knutsson\AppData\Roaming\npm\node_modules\firebase-tools\bin\firebase deploy --only functions
+[debug] [2018-01-09T12:24:59.816Z] CLI Version:   3.16.0
+[debug] [2018-01-09T12:24:59.816Z] Platform:      win32
+[debug] [2018-01-09T12:24:59.816Z] Node Version:  v8.6.0
+[debug] [2018-01-09T12:24:59.816Z] Time:          Tue Jan 09 2018 13:24:59 GMT+0100 (W. Europe Standard Time)
+[debug] [2018-01-09T12:24:59.816Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-01-09T12:24:59.848Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-01-09T12:24:59.848Z] > authorizing via signed-in user
+[debug] [2018-01-09T12:24:59.850Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-01-09T12:24:59.850Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/T1Jm_nDGHj9-n2K-S-u39sw0O8zc9lbEsHPiHIUO3P0',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Tue Jan 09 2018 13:24:59 GMT+0100 (W. Europe Standard Time)
+[debug] [2018-01-09T12:25:06.483Z] <<< HTTP RESPONSE 200
+[debug] [2018-01-09T12:25:06.535Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/runforest-eaf5e  
+  
+ Tue Jan 09 2018 13:25:06 GMT+0100 (W. Europe Standard Time)
+[debug] [2018-01-09T12:25:17.567Z] Error: getaddrinfo ENOTFOUND admin.firebase.com admin.firebase.com:443
+    at errnoException (dns.js:53:10)
+    at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:95:26)
+[error] 
+[error] Error: Server Error. getaddrinfo ENOTFOUND admin.firebase.com admin.firebase.com:443
