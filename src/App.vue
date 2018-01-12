@@ -1,8 +1,11 @@
 <template>
   <div id="app">
     <v-app light>
-      <v-navigation-drawer fixed v-model="drawer" app>
+      <v-navigation-drawer fixed clipped v-model="drawer" app>
         <v-list dense>
+          <v-subheader>
+            Löpning
+          </v-subheader>
           <v-list-tile @click="goto('track')">
             <v-list-tile-action>
               <v-icon>track_changes</v-icon>
@@ -19,12 +22,16 @@
               <v-list-tile-title>Stats</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
+          <v-divider dark></v-divider>
+          <v-subheader>
+            Vikt
+          </v-subheader>
           <v-list-tile @click="goto('weight')">
             <v-list-tile-action>
               <v-icon>straighten</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Vikt</v-list-tile-title>
+              <v-list-tile-title>Track</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -39,7 +46,7 @@
 
       </v-toolbar>
       <v-content>
-          <router-view></router-view>
+        <router-view></router-view>
       </v-content>
     </v-app>
   </div>

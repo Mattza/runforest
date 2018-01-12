@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <line-chart v-if="chartdata.datasets.length" :data="chartdata"></line-chart>
+    <line-chart v-if="chartdata.datasets.length" :data="chartdata" :options="chartoptions"></line-chart>
     <div class="well">{{runs}}</div>
   </div>
 </template>
@@ -16,7 +16,20 @@ export default {
     return {
       chartdata: {
         datasets: []
-      }
+      },
+      chartoptions: {
+        elements: {
+          line: {
+            tension: 0
+          }
+        },
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      },
+      weights: []
     }
   },
   filters: {
@@ -37,6 +50,7 @@ export default {
     runs: {
       source: db.ref('/track'),
       readyCallback: function (data) {
+        this.chartdata.labels = this.runs.map(run => run.date.split('T')[0])
         this.chartdata.datasets.push(
           {
             label: 'Distance',
