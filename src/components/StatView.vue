@@ -44,6 +44,7 @@ export default {
         }]
       },
       weights: [],
+      yearTotalDistance: 0,
       yearExpectedDistance: (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
     }
   },
@@ -65,18 +66,23 @@ export default {
       this.yearExpectedDistance = (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
     }, 100)
   },
-  firebase: {
-    runs: {
-      source: db.ref('/track'),
-      readyCallback: function (data) {
-        const short = 8
-        const long = 11
-        const shortRuns = this.runs.filter(run => parseFloat(run.distance) <= short)
-        const mediumRuns = this.runs.filter(run => parseFloat(run.distance) > short && parseFloat(run.distance) <= long)
-        const longRuns = this.runs.filter(run => parseFloat(run.distance) > long)
-        createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed)
-        createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed)
-        createChartData(longRuns, this.longChartdata, this.$options.filters.speed)
+  firebase: function () {
+    return {
+      runs: {
+        source: db.ref(`/track/${this.$user.uid}`),
+        readyCallback: function (data) {
+          console.log(this.runs[this.runs.length - 1].date > new Date('2019-01-01'))
+          this.yearTotalDistance = this.runs.filter(run => new Date(run.date) > new Date('2019-01-01'))
+            .reduce((acc, item) => acc + parseFloat(item.distance), 0)
+          const short = 8
+          const long = 11
+          const shortRuns = this.runs.filter(run => parseFloat(run.distance) <= short)
+          const mediumRuns = this.runs.filter(run => parseFloat(run.distance) > short && parseFloat(run.distance) <= long)
+          const longRuns = this.runs.filter(run => parseFloat(run.distance) > long)
+          createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed)
+          createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed)
+          createChartData(longRuns, this.longChartdata, this.$options.filters.speed)
+        }
       }
     }
   }

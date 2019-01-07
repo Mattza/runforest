@@ -83,7 +83,7 @@ export default {
   computed: {
     orderedRuns: function () {
       return this.runs && this.runs.sort((a, b) => {
-        return a.date < b.date
+        return new Date(b.date) - new Date(a.date)
       })
     }
   },
@@ -102,8 +102,12 @@ export default {
       console.log('goto', run)
     }
   },
-  firebase: {
-    runs: db.ref('/track')
+  firebase: function () {
+    return {
+      runs: {
+        source: db.ref(`/track/${this.$user.uid}`)
+      }
+    }
   }
 }
 </script>
