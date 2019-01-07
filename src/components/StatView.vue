@@ -1,6 +1,14 @@
 <template>
   <div class="main">
-    <line-chart v-if="chartdata.datasets.length" :data="chartdata" :options="chartoptions"></line-chart>
+    <h1>1000K MÅLET!</h1>
+    <h3>Hittills: {{yearTotalDistance}}</h3>
+    <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
+    <h1>Runt milen</h1>
+    <line-chart v-if="mediumChartdata.datasets.length" :data="mediumChartdata" :options="chartoptions"></line-chart>
+    <h1>Långa pass</h1>
+    <line-chart v-if="longChartdata.datasets.length" :data="longChartdata" :options="chartoptions"></line-chart>
+    <h1>Korta pass</h1>
+    <line-chart v-if="shortChartdata.datasets.length" :data="shortChartdata" :options="chartoptions"></line-chart>
     <div class="well">{{runs}}</div>
   </div>
 </template>
@@ -14,7 +22,13 @@ export default {
   components: { LineChart },
   data () {
     return {
-      chartdata: {
+      shortChartdata: {
+        datasets: []
+      },
+      mediumChartdata: {
+        datasets: []
+      },
+      longChartdata: {
         datasets: []
       },
       chartoptions: {
@@ -29,7 +43,8 @@ export default {
           }
         }]
       },
-      weights: []
+      weights: [],
+      yearExpectedDistance: (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
     }
   },
   filters: {
@@ -45,35 +60,45 @@ export default {
       return 2
     }
   },
-  methods: {},
+  created: function () {
+    setInterval(() => {
+      this.yearExpectedDistance = (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
+    }, 100)
+  },
   firebase: {
     runs: {
       source: db.ref('/track'),
       readyCallback: function (data) {
-        this.chartdata.labels = this.runs.map(run => run.date.split('T')[0])
-        this.chartdata.datasets.push(
-          {
-            label: 'Distance',
-            borderColor: 'grey',
-            fill: false,
-            data: this.runs.map(run => parseFloat(run.distance))
-          }
-        )
-        this.chartdata.datasets.push(
-          {
-            label: 'Speed',
-            borderColor: 'red',
-            fill: false,
-            data: this.runs.map(this.$options.filters.speed)
-          }
-        )
+        const short = 8
+        const long = 11
+        const shortRuns = this.runs.filter(run => parseFloat(run.distance) <= short)
+        const mediumRuns = this.runs.filter(run => parseFloat(run.distance) > short && parseFloat(run.distance) <= long)
+        const longRuns = this.runs.filter(run => parseFloat(run.distance) > long)
+        createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed)
+        createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed)
+        createChartData(longRuns, this.longChartdata, this.$options.filters.speed)
       }
     }
   }
+}
+
+const createChartData = (runs, chartData, speedFilter) => {
+  chartData.labels = runs.map(run => run.date.split('T')[0])
+  chartData.datasets.push({
+    label: 'Distance',
+    borderColor: 'grey',
+    fill: false,
+    data: runs.map(run => parseFloat(run.distance))
+  })
+  chartData.datasets.push({
+    label: 'Speed',
+    borderColor: 'red',
+    fill: false,
+    data: runs.map(speedFilter)
+  })
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>
