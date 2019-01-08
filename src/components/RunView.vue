@@ -25,47 +25,30 @@
           </v-card-actions>
         </v-card>
       </v-form>
-
     </v-container>
-    <v-list two-line>
-      <template v-for="(run, index) in orderedRuns">
-        <v-list-tile avatar v-bind:key="run.title" @click="gotoRun(run)">
-          <v-list-tile-content>
-            <v-list-tile-title>{{ run.date | date }}</v-list-tile-title>
-            <v-list-tile-sub-title class="grey--text text--darken-4">
-              <v-layout row>
-                <v-flex xs3>
-                  <v-layout column wrap>
-                    <v-flex>Tid</v-flex>
-                    <v-flex> {{run.time}}</v-flex>
-                  </v-layout>
-                </v-flex>
-                <v-flex xs3>
-                  <v-layout column wrap>
-                    <v-flex>Sträcka</v-flex>
-                    <v-flex> {{run.distance}}km </v-flex>
-                  </v-layout>
-                </v-flex>
-                <v-flex xs3>
-                  <v-layout column wrap>
-                    <v-flex>Hastighet</v-flex>
-                    <v-flex> {{run|speed}}
-                    </v-flex>
-                  </v-layout>
-                </v-flex>
-                <v-flex xs3>
-                  <v-layout column wrap>
-                    <v-flex>Km-tid</v-flex>
-                    <v-flex>{{run|pace}}</v-flex>
-                  </v-layout>
-                </v-flex>
-              </v-layout>
-            </v-list-tile-sub-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-divider v-bind:key="run.title" v-if="index !== runs.length - 1"></v-divider>
-      </template>
-    </v-list>
+    <v-container>
+    <template v-if="orderedRuns">
+      <v-data-table
+      v-bind:headers="headers"
+      :items="orderedRuns"
+      hide-actions
+      disable-inital-sort="true"
+      :custom-sort="customSort"
+      class="elevation-1"
+      >
+        <template slot="items" slot-scope="run">
+          <tr>
+            <td class="text-xs-right">{{run.item.date | date}}</td>
+            <td class="text-xs-right">{{run.item.time}}</td>
+            <td class="text-xs-right">{{run.item.distance}}km</td>
+            <td class="text-xs-right">{{run.item | speed}}</td>
+            <td class="text-xs-right">{{run.item | pace}}</td>
+            <td class="text-xs-right" ><v-icon @click="remove(run.item)">delete</v-icon></td>
+          </tr>
+        </template>    
+    </v-data-table>
+    </template>
+    </v-container>
   </div>
 </template>
 
@@ -77,7 +60,39 @@ export default {
   data () {
     return {
       newRun: {},
-      valid: true
+      valid: true,
+      headers: [
+        {text: 'Datum', value: 'date'},
+        {text: 'Tid', value: 'time'},
+        {text: 'Km', value: 'distance'},
+        {text: 'Fart', value: 'speed'},
+        {text: '', value: 'speed'},
+        {text: '', value: 'speed'}
+      ],
+      customSort: function (arr, index, isDescending) {
+        if (!index) {
+          return arr
+        }
+        console.log(arr, index, isDescending, arr[0][index], arr[1][index])
+        return arr.sort((a, b) => {
+          let sortA = a[index]
+          let sortB = b[index]
+          if (index === 'date') {
+            sortA = new Date(sortA)
+            sortB = new Date(sortB)
+          }
+          if (index === 'time') {
+            sortA = sortA.split(':')[0] * 60 + sortA.split(':')[1]
+            sortB = sortB.split(':')[0] * 60 + sortB.split(':')[1]
+          }
+          if (index === 'speed') {
+            sortA = this.$options.filters.speed(a)
+            sortB = this.$options.filters.speed(b)
+            console.log(a, sortA)
+          }
+          return (isDescending ? -1 : 1) * (sortB - sortA)
+        })
+      }
     }
   },
   computed: {
@@ -98,8 +113,9 @@ export default {
         this.$firebaseRefs.runs.push(obj)
       }
     },
-    gotoRun: function (run) {
-      console.log('goto', run)
+    remove: function (run) {
+      console.log('delete', run)
+      this.$firebaseRefs.runs.child(run).remove()
     }
   },
   firebase: function () {
@@ -113,6 +129,15 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
 
+table.table tbody td, 
+table.table tbody th,
+table.table thead td,
+table.table thead th {
+  padding:0!important;
+}
+thead th:nth-of-type(1){
+  width:76px;
+}
 </style>
