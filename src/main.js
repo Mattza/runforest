@@ -6,6 +6,7 @@ import Vuetify from 'vuetify'
 import App from './App'
 import router from './router'
 import firebase from 'firebase'
+import { VueMaskDirective } from 'v-mask'
 
 import 'vuetify/dist/vuetify.min.css'
 
@@ -18,6 +19,8 @@ Vue.use(Vuetify, {
     error: '#b71c1c'
   }
 })
+
+Vue.directive('mask', VueMaskDirective)
 
 Vue.config.productionTip = false
 

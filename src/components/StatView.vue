@@ -1,14 +1,25 @@
 <template>
   <div class="main">
-    <h1>1000K MÅLET!</h1>
-    <h3>Hittills: {{yearTotalDistance}}</h3>
-    <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
-    <h1>Runt milen</h1>
-    <line-chart v-if="mediumChartdata.datasets.length" :data="mediumChartdata" :options="chartoptions"></line-chart>
-    <h1>Långa pass</h1>
-    <line-chart v-if="longChartdata.datasets.length" :data="longChartdata" :options="chartoptions"></line-chart>
-    <h1>Korta pass</h1>
-    <line-chart v-if="shortChartdata.datasets.length" :data="shortChartdata" :options="chartoptions"></line-chart>
+    <v-container fluid>
+      <h1>1000K MÅLET!</h1>
+      <h3>Hittills: {{yearTotalDistance}}</h3>
+      <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
+      <h1>Snabbast</h1>
+      <template v-for="run in fastests">
+        <div class="fastest">
+          <h3>{{run.distance}}km:</h3>
+          <h3>{{run.time}}</h3>
+          <h3>{{run|speed}}</h3>
+        </div>
+      </template>
+    
+      <h1>Runt milen</h1>
+      <line-chart v-if="mediumChartdata.datasets.length" :data="mediumChartdata" :options="chartoptions"></line-chart>
+      <h1>Långa pass</h1>
+      <line-chart v-if="longChartdata.datasets.length" :data="longChartdata" :options="chartoptions"></line-chart>
+      <h1>Korta pass</h1>
+      <line-chart v-if="shortChartdata.datasets.length" :data="shortChartdata" :options="chartoptions"></line-chart>
+    </v-container>
     <div class="well">{{runs}}</div>
   </div>
 </template>
@@ -45,7 +56,8 @@ export default {
       },
       weights: [],
       yearTotalDistance: 0,
-      yearExpectedDistance: (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
+      yearExpectedDistance: (new Date() - new Date('2019-01-01')) / 31536000000 * 1000,
+      fastests: []
     }
   },
   filters: {
@@ -71,9 +83,11 @@ export default {
       runs: {
         source: db.ref(`/track/${this.$user.uid}`),
         readyCallback: function (data) {
-          console.log(this.runs[this.runs.length - 1].date > new Date('2019-01-01'))
           this.yearTotalDistance = this.runs.filter(run => new Date(run.date) > new Date('2019-01-01'))
             .reduce((acc, item) => acc + parseFloat(item.distance), 0)
+          const getFast = getFastestRun(this.runs, this.$options.filters.speed)
+          this.fastests.push(getFast('5'))
+          this.fastests.push(getFast('10'))
           const short = 8
           const long = 11
           const shortRuns = this.runs.filter(run => parseFloat(run.distance) <= short)
@@ -103,8 +117,19 @@ const createChartData = (runs, chartData, speedFilter) => {
     data: runs.map(speedFilter)
   })
 }
+
+const getFastestRun = (runs, speedFilter) => distance => runs.filter(item => item.distance === distance).reduce((best, item) =>
+ parseFloat(speedFilter(item)) > parseFloat(speedFilter(best)) ? item : best)
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.fastest{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.fastest  * {
+  width: 40px;
+}
 </style>

@@ -5,20 +5,8 @@
       <v-form v-model="valid" ref="form" lazy-validation>
         <v-card>
           <v-card-text>
-            <v-text-field label="Tid" v-model="newRun.time" required></v-text-field>
+            <v-text-field label="Tid" v-model="newRun.time" v-mask="'##:##'" required></v-text-field>
             <v-text-field label="Sträcka(km)" v-model="newRun.distance" required></v-text-field>
-           
-            <v-layout row wrap justify-space-around>
-              <v-flex xs5>
-                <!-- <v-text-field label="Tid" v-model="newRun.time" required></v-text-field> -->
-              </v-flex>
-              <v-flex xs5>
-                <!-- <v-text-field label="Sträcka(km)" v-model="newRun.distance" required></v-text-field> -->
-              </v-flex>
-              <v-flex xs6>
-                <!-- <v-btn @click="submit" :disabled="!valid">Lägg till</v-btn> -->
-              </v-flex>
-            </v-layout>
           </v-card-text>
           <v-card-actions>
              <v-btn @click="submit" :disabled="!valid">Lägg till</v-btn>
@@ -27,7 +15,7 @@
       </v-form>
     </v-container>
     <v-container>
-    <template v-if="orderedRuns">
+    <template v-if="orderedRuns && orderedRuns.length">
       <v-data-table
       v-bind:headers="headers"
       :items="orderedRuns"
@@ -73,7 +61,6 @@ export default {
         if (!index) {
           return arr
         }
-        console.log(arr, index, isDescending, arr[0][index], arr[1][index])
         return arr.sort((a, b) => {
           let sortA = a[index]
           let sortB = b[index]
@@ -115,7 +102,10 @@ export default {
     },
     remove: function (run) {
       console.log('delete', run)
-      this.$firebaseRefs.runs.child(run).remove()
+      this.$firebaseRefs.runs.child(run['.key']).remove()
+    },
+    handleTime: function (el) {
+      console.log(el)
     }
   },
   firebase: function () {
