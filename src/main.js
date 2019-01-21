@@ -53,6 +53,8 @@ Vue.filter('date', date => date.split('T')[0])
 Vue.filter('pace', ({ distance, time }) => {
   let km = parseFloat(distance)
   let [minutes, seconds] = time.split(':')
-  minutes = parseInt(minutes) + parseInt(seconds) / 60
-  return (minutes / km).toFixed(2)
+  const secondspkm = (parseInt(minutes) * 60 + parseInt(seconds)) / km
+  let secondss = secondspkm % 60
+  let minutess = Math.floor(secondspkm / 60)
+  return minutess + ':' + secondss.toFixed(0)
 })
