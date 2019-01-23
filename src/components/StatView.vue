@@ -88,34 +88,37 @@ export default {
           const getFast = getFastestRun(this.runs, this.$options.filters.speed)
           this.fastests.push(getFast('5'))
           this.fastests.push(getFast('10'))
-          const short = 8
-          const long = 11
-          const shortRuns = this.runs.filter(run => parseFloat(run.distance) <= short)
-          const mediumRuns = this.runs.filter(run => parseFloat(run.distance) > short && parseFloat(run.distance) <= long)
+          const short = 5
+          const long = 10
+          const shortRuns = this.runs.filter(run => parseFloat(run.distance) === short)
+          const mediumRuns = this.runs.filter(run => parseFloat(run.distance) === long) // > short && parseFloat(run.distance) <= long
           const longRuns = this.runs.filter(run => parseFloat(run.distance) > long)
-          createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed)
-          createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed)
-          createChartData(longRuns, this.longChartdata, this.$options.filters.speed)
+          createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed, false)
+          createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed, false)
+          createChartData(longRuns, this.longChartdata, this.$options.filters.speed, true)
         }
       }
     }
   }
 }
 
-const createChartData = (runs, chartData, speedFilter) => {
+const createChartData = (runs, chartData, speedFilter, distance) => {
   chartData.labels = runs.map(run => run.date.split('T')[0])
-  chartData.datasets.push({
-    label: 'Distance',
-    borderColor: 'grey',
-    fill: false,
-    data: runs.map(run => parseFloat(run.distance))
-  })
-  chartData.datasets.push({
-    label: 'Speed',
-    borderColor: 'red',
-    fill: false,
-    data: runs.map(speedFilter)
-  })
+  if (distance) {
+    chartData.datasets.push({
+      label: 'Distance',
+      borderColor: 'grey',
+      fill: false,
+      data: runs.map(run => parseFloat(run.distance))
+    })
+  } else {
+    chartData.datasets.push({
+      label: 'Speed',
+      borderColor: 'red',
+      fill: false,
+      data: runs.map(speedFilter)
+    })
+  }
 }
 
 const getFastestRun = (runs, speedFilter) => distance => runs.filter(item => item.distance === distance).reduce((best, item) =>
