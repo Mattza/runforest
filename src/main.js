@@ -56,5 +56,5 @@ Vue.filter('pace', ({ distance, time }) => {
   const secondspkm = (parseInt(minutes) * 60 + parseInt(seconds)) / km
   let secondss = secondspkm % 60
   let minutess = Math.floor(secondspkm / 60)
-  return minutess + ':' + secondss.toFixed(0)
+  return minutess + ':' + ('0' + secondss.toFixed(0)).slice(-2)
 })

@@ -5,11 +5,11 @@
       <h3>Hittills: {{yearTotalDistance}}</h3>
       <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
       <h1>Snabbast</h1>
-      <template v-for="run in fastests">
+      <template v-for="fast in fastests">
         <div class="fastest">
-          <h3>{{run.distance}}km:</h3>
-          <h3>{{run.time}}</h3>
-          <h3>{{run|speed}}</h3>
+          <h3>{{fast.text}} {{fast.run.distance}}:</h3>
+          <h3>{{fast.run.time}}</h3>
+          <h3>{{fast.run|speed}}</h3>
         </div>
       </template>
     
@@ -86,8 +86,17 @@ export default {
           this.yearTotalDistance = this.runs.filter(run => new Date(run.date) > new Date('2019-01-01'))
             .reduce((acc, item) => acc + parseFloat(item.distance), 0)
           const getFast = getFastestRun(this.runs, this.$options.filters.speed)
-          this.fastests.push(getFast('5'))
-          this.fastests.push(getFast('10'))
+          this.fastests.push({text: '', run: getFast('5')})
+          this.fastests.push({text: '', run: getFast('10')})
+          this.fastests.push({
+            text: 'Lång',
+            run: this.runs.reduce((best, item) => parseFloat(best.distance) > parseFloat(item.distance) ? best : item)
+          })
+          this.fastests.push({
+            text: 'Timman',
+            run: this.runs.filter(item => item.time === '60:00')
+              .reduce((best, item) => parseFloat(best.distance) > parseFloat(item.distance) ? best : item)
+          })
           const short = 5
           const long = 10
           const shortRuns = this.runs.filter(run => parseFloat(run.distance) === short)
@@ -132,7 +141,10 @@ const getFastestRun = (runs, speedFilter) => distance => runs.filter(item => ite
   flex-direction: row;
   justify-content: space-around;
 }
-.fastest  * {
-  width: 40px;
+.fastest > *{
+  min-width: 80px;
+}
+.fastest > *:first-child {
+  flex-grow: 1;
 }
 </style>
