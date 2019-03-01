@@ -4,6 +4,7 @@
       <h1>1000K MÅLET!</h1>
       <h3>Hittills: {{yearTotalDistance}}</h3>
       <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
+      <h3>Före: {{ahead.toFixed(1)}} dagar</h3>
       <h1>Snabbast</h1>
       <template v-for="fast in fastests">
         <div class="fastest">
@@ -78,13 +79,23 @@ export default {
       this.yearExpectedDistance = (new Date() - new Date('2019-01-01')) / 31536000000 * 1000
     }, 100)
   },
+  computed: {
+    // a computed getter
+    ahead: function () {
+      // `this` points to the vm instance
+      const aheadKM = this.yearTotalDistance - this.yearExpectedDistance
+      const aheadDays = aheadKM * 365 / 1000
+      return aheadDays
+    }
+  },
   firebase: function () {
     return {
       runs: {
         source: db.ref(`/track/${this.$user.uid}`),
         readyCallback: function (data) {
-          this.yearTotalDistance = this.runs.filter(run => new Date(run.date) > new Date('2019-01-01'))
-            .reduce((acc, item) => acc + parseFloat(item.distance), 0)
+          const roundToTwoDecimals = num => Math.round(num * 100) / 100
+          this.yearTotalDistance = roundToTwoDecimals(this.runs.filter(run => new Date(run.date) > new Date('2019-01-01'))
+            .reduce((acc, item) => acc + parseFloat(item.distance), 0))
           const getFast = getFastestRun(this.runs, this.$options.filters.speed)
           this.fastests.push({text: '', run: getFast('5')})
           this.fastests.push({text: '', run: getFast('10')})
