@@ -4,7 +4,11 @@
       <h1>1000K MÅLET!</h1>
       <h3>Hittills: {{yearTotalDistance}}</h3>
       <h3>Borde ha: {{(yearExpectedDistance||0).toFixed(6)}}</h3>
-      <h3>Före: {{ahead.toFixed(1)}} dagar</h3>
+      <h3>{{ahead>0?'Före:':'Efter:'}} {{Math.abs(ahead.toFixed(1))}} dagar</h3>
+      <h3>Denna veckan: {{weeksDistance}}</h3>
+      <h3>Veckomål: {{weekGoal.toFixed(2)}}</h3>
+      <h3>Veckomål - kvar: {{(weekGoal - weeksDistance).toFixed(2)}}</h3>
+      
       <h1>Snabbast</h1>
       <template v-for="fast in fastests">
         <div class="fastest">
@@ -13,13 +17,25 @@
           <h3>{{fast.run|speed}}</h3>
         </div>
       </template>
-    
+
       <h1>Runt milen</h1>
-      <line-chart v-if="mediumChartdata.datasets.length" :data="mediumChartdata" :options="chartoptions"></line-chart>
+      <line-chart
+        v-if="mediumChartdata.datasets.length"
+        :data="mediumChartdata"
+        :options="chartoptions"
+      ></line-chart>
       <h1>Långa pass</h1>
-      <line-chart v-if="longChartdata.datasets.length" :data="longChartdata" :options="chartoptions"></line-chart>
+      <line-chart
+        v-if="longChartdata.datasets.length"
+        :data="longChartdata"
+        :options="chartoptions"
+      ></line-chart>
       <h1>Korta pass</h1>
-      <line-chart v-if="shortChartdata.datasets.length" :data="shortChartdata" :options="chartoptions"></line-chart>
+      <line-chart
+        v-if="shortChartdata.datasets.length"
+        :data="shortChartdata"
+        :options="chartoptions"
+      ></line-chart>
     </v-container>
     <div class="well">{{runs}}</div>
   </div>
@@ -58,7 +74,9 @@ export default {
       weights: [],
       yearTotalDistance: 0,
       yearExpectedDistance: (new Date() - new Date('2019-01-01')) / 31536000000 * 1000,
-      fastests: []
+      fastests: [],
+      weeksDistance: 0,
+      weekGoal: 0
     }
   },
   filters: {
@@ -116,6 +134,19 @@ export default {
           createChartData(shortRuns, this.shortChartdata, this.$options.filters.speed, false)
           createChartData(mediumRuns, this.mediumChartdata, this.$options.filters.speed, false)
           createChartData(longRuns, this.longChartdata, this.$options.filters.speed, true)
+
+          const now = new Date()
+          const dayOfWeek = now.getDay()
+          const currentMonday = new Date(now.setDate(now.getDate() - dayOfWeek + 1))
+          console.log(currentMonday, this.runs[0].date)
+          currentMonday.setHours(0, 0, 0, 0)
+          const thisWeeksRuns = this.runs.filter(run => new Date(run.date) > currentMonday)
+          console.log('thisWeeksRuns', thisWeeksRuns)
+          this.weeksDistance = thisWeeksRuns.reduce((acc, item) => acc + parseFloat(item.distance), 0)
+          const yearProgressMonday = (currentMonday - new Date('2019-01-01')) / 31536000000
+          const remainingDays = (1 - yearProgressMonday) * 365
+          const remainingKm = 1000 - this.yearTotalDistance + this.weeksDistance
+          this.weekGoal = remainingKm / remainingDays * 7
         }
       }
     }
@@ -147,12 +178,12 @@ const getFastestRun = (runs, speedFilter) => distance => runs.filter(item => ite
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.fastest{
+.fastest {
   display: flex;
   flex-direction: row;
   justify-content: space-around;
 }
-.fastest > *{
+.fastest > * {
   min-width: 80px;
 }
 .fastest > *:first-child {
