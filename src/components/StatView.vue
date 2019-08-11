@@ -136,7 +136,7 @@ export default {
           createChartData(longRuns, this.longChartdata, this.$options.filters.speed, true)
 
           const now = new Date()
-          const dayOfWeek = now.getDay()
+          const dayOfWeek = now.getDay() || 7
           const currentMonday = new Date(now.setDate(now.getDate() - dayOfWeek + 1))
           console.log(currentMonday, this.runs[0].date)
           currentMonday.setHours(0, 0, 0, 0)
