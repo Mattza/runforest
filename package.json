@@ -16,7 +16,7 @@
     "deploy": "npm run build && firebase deploy -p dist --only hosting"
   },
   "dependencies": {
-    "chart.js": "^2.7.1",
+    "chart.js": "^2.9.4",
     "firebase": "^4.8.1",
     "firebaseui": "^2.5.1",
     "v-mask": "^2.0.2",
